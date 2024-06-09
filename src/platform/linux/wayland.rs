@@ -79,15 +79,31 @@ impl Clipboard {
 		text: Cow<'_, str>,
 		selection: LinuxClipboardKind,
 		wait: WaitConfig,
+		exclude_from_history: bool,
 	) -> Result<(), Error> {
 		let mut opts = Options::new();
 		opts.foreground(matches!(wait, WaitConfig::Forever));
 		opts.clipboard(selection.try_into()?);
 		let source = Source::Bytes(text.into_owned().into_bytes().into_boxed_slice());
-		opts.copy(source, MimeType::Text).map_err(|e| match e {
-			CopyError::PrimarySelectionUnsupported => Error::ClipboardNotSupported,
-			other => into_unknown(other),
-		})?;
+		if exclude_from_history {
+
+			let password_manager_hint = Source::Bytes(b"secret".to_vec().into());
+			let password_manager_hint_mime = MimeType::Specific(String::from("x-kde-passwordManagerHint"));
+
+			opts.copy_multi(vec![
+				MimeSource { source: source, mime_type: MimeType::Text },
+				MimeSource { source: password_manager_hint, mime_type: password_manager_hint_mime },
+			]).map_err(|e| match e {
+				CopyError::PrimarySelectionUnsupported => Error::ClipboardNotSupported,
+				other => into_unknown(other),
+			})?;
+		} else {
+
+			opts.copy(source, MimeType::Text).map_err(|e| match e {
+				CopyError::PrimarySelectionUnsupported => Error::ClipboardNotSupported,
+				other => into_unknown(other),
+			})?;
+		}
 		Ok(())
 	}
 

@@ -80,6 +80,7 @@ x11rb::atom_manager! {
 		HTML: b"text/html",
 
 		PNG_MIME: b"image/png",
+		X_KDE_PASSWORDMANAGERHINT: b"x-kde-passwordManagerHint",
 
 		// This is just some random name for the property on our window, into which
 		// the clipboard owner writes the data we requested.
@@ -878,11 +879,20 @@ impl Clipboard {
 		message: Cow<'_, str>,
 		selection: LinuxClipboardKind,
 		wait: WaitConfig,
+		exclude_from_history: bool,
 	) -> Result<()> {
-		let data = vec![ClipboardData {
+		let mut data = vec![];
+		data.push(ClipboardData {
 			bytes: message.into_owned().into_bytes(),
 			format: self.inner.atoms.UTF8_STRING,
-		}];
+		});
+		if exclude_from_history {
+			data.push(ClipboardData {
+				bytes: b"secret".to_vec(),
+				format: self.inner.atoms.X_KDE_PASSWORDMANAGERHINT,
+			});
+
+		}
 		self.inner.write(data, selection, wait)
 	}
 
