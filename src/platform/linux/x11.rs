@@ -891,7 +891,6 @@ impl Clipboard {
 				bytes: b"secret".to_vec(),
 				format: self.inner.atoms.X_KDE_PASSWORDMANAGERHINT,
 			});
-
 		}
 		self.inner.write(data, selection, wait)
 	}

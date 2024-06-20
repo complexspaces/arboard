@@ -163,15 +163,24 @@ pub(crate) struct Set<'clipboard> {
 
 impl<'clipboard> Set<'clipboard> {
 	pub(crate) fn new(clipboard: &'clipboard mut Clipboard) -> Self {
-		Self { clipboard, wait: WaitConfig::default(), selection: LinuxClipboardKind::Clipboard, exclude_from_history: false, }
+		Self {
+			clipboard,
+			wait: WaitConfig::default(),
+			selection: LinuxClipboardKind::Clipboard,
+			exclude_from_history: false,
+		}
 	}
 
 	pub(crate) fn text(self, text: Cow<'_, str>) -> Result<(), Error> {
 		match self.clipboard {
-			Clipboard::X11(clipboard) => clipboard.set_text(text, self.selection, self.wait, self.exclude_from_history),
+			Clipboard::X11(clipboard) => {
+				clipboard.set_text(text, self.selection, self.wait, self.exclude_from_history)
+			}
 
 			#[cfg(feature = "wayland-data-control")]
-			Clipboard::WlDataControl(clipboard) => clipboard.set_text(text, self.selection, self.wait, self.exclude_from_history),
+			Clipboard::WlDataControl(clipboard) => {
+				clipboard.set_text(text, self.selection, self.wait, self.exclude_from_history)
+			}
 		}
 	}
 
@@ -255,7 +264,6 @@ pub trait SetExtLinux: private::Sealed {
 	/// # }
 	/// ```
 	fn clipboard(self, selection: LinuxClipboardKind) -> Self;
-
 
 	/// Excludes the data which will be set on the clipboard from being added to
 	/// the desktop clipboard managers' histories by adding the MIME-Type `x-kde-passwordMangagerHint`
