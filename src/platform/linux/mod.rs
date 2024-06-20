@@ -261,7 +261,7 @@ pub trait SetExtLinux: private::Sealed {
 	/// the desktop clipboard managers' histories by adding the MIME-Type `x-kde-passwordMangagerHint`
 	/// to the clipboard's selection data.
 	///
-	/// This is seems to be the convention for this on Linux
+	/// This is the most widely adopted convention on Linux.
 	fn exclude_from_history(self) -> Self;
 }
 
