@@ -46,6 +46,7 @@ use x11rb::{
 #[cfg(feature = "image-data")]
 use super::encode_as_png;
 use super::{into_unknown, LinuxClipboardKind, WaitConfig};
+use super::{KDE_EXCLUSION_HINT, KDE_EXCLUSION_MIME};
 #[cfg(feature = "image-data")]
 use crate::ImageData;
 use crate::{common::ScopeGuard, Error};
@@ -80,7 +81,7 @@ x11rb::atom_manager! {
 		HTML: b"text/html",
 
 		PNG_MIME: b"image/png",
-		X_KDE_PASSWORDMANAGERHINT: b"x-kde-passwordManagerHint",
+		X_KDE_PASSWORDMANAGERHINT: KDE_EXCLUSION_MIME.as_bytes(),
 
 		// This is just some random name for the property on our window, into which
 		// the clipboard owner writes the data we requested.
@@ -888,7 +889,7 @@ impl Clipboard {
 		});
 		if exclude_from_history {
 			data.push(ClipboardData {
-				bytes: b"secret".to_vec(),
+				bytes: KDE_EXCLUSION_HINT.to_vec(),
 				format: self.inner.atoms.X_KDE_PASSWORDMANAGERHINT,
 			});
 		}

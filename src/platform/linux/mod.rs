@@ -7,6 +7,10 @@ use log::{trace, warn};
 use crate::ImageData;
 use crate::{common::private, Error};
 
+// Magic strings used in `Set::exclude_from_history()` on linux
+const KDE_EXCLUSION_MIME: &str = "x-kde-passwordManagerHint";
+const KDE_EXCLUSION_HINT: &[u8] = b"secret";
+
 mod x11;
 
 #[cfg(feature = "wayland-data-control")]

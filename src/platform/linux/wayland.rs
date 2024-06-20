@@ -10,6 +10,7 @@ use wl_clipboard_rs::{
 #[cfg(feature = "image-data")]
 use super::encode_as_png;
 use super::{into_unknown, LinuxClipboardKind, WaitConfig};
+use super::{KDE_EXCLUSION_HINT, KDE_EXCLUSION_MIME};
 use crate::common::Error;
 #[cfg(feature = "image-data")]
 use crate::common::ImageData;
@@ -86,24 +87,20 @@ impl Clipboard {
 		opts.clipboard(selection.try_into()?);
 		let source = Source::Bytes(text.into_owned().into_bytes().into_boxed_slice());
 		if exclude_from_history {
-
-			let password_manager_hint = Source::Bytes(b"secret".to_vec().into());
-			let password_manager_hint_mime = MimeType::Specific(String::from("x-kde-passwordManagerHint"));
-
 			opts.copy_multi(vec![
-				MimeSource { source: source, mime_type: MimeType::Text },
-				MimeSource { source: password_manager_hint, mime_type: password_manager_hint_mime },
-			]).map_err(|e| match e {
-				CopyError::PrimarySelectionUnsupported => Error::ClipboardNotSupported,
-				other => into_unknown(other),
-			})?;
+				MimeSource { source, mime_type: MimeType::Text },
+				MimeSource {
+					source: Source::Bytes(Box::from(KDE_EXCLUSION_HINT)),
+					mime_type: MimeType::Specific(String::from(KDE_EXCLUSION_MIME)),
+				},
+			])
 		} else {
-
-			opts.copy(source, MimeType::Text).map_err(|e| match e {
-				CopyError::PrimarySelectionUnsupported => Error::ClipboardNotSupported,
-				other => into_unknown(other),
-			})?;
+			opts.copy(source, MimeType::Text)
 		}
+		.map_err(|e| match e {
+			CopyError::PrimarySelectionUnsupported => Error::ClipboardNotSupported,
+			other => into_unknown(other),
+		})?;
 		Ok(())
 	}
 
