@@ -258,8 +258,8 @@ pub trait SetExtLinux: private::Sealed {
 
 
 	/// Excludes the data which will be set on the clipboard from being added to
-	/// the cliobard managers' histories by adding the MIME-Type x-kde-passwordMangagerHint
-	/// with the content 'secret' to the clipboard.
+	/// the desktop clipboard managers' histories by adding the MIME-Type `x-kde-passwordMangagerHint`
+	/// to the clipboard's selection data.
 	///
 	/// This is seems to be the convention for this on Linux
 	fn exclude_from_history(self) -> Self;
